@@ -17,122 +17,116 @@ public class TelaInicialEmbaixada extends JFrame {
         String nomeUsuario = SessaoUsuario.getUsuarioLogado();
         String nacionalidade = SessaoUsuario.getNacionalidade();
 
-        // Adiciona opções com base na nacionalidade
+        // Criar painel principal
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(240, 240, 240));
+        add(panel, BorderLayout.CENTER);
+
+        // Barra superior com os JComboBox e saudação
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(new Color(0, 123, 255));
+
+        // Saudação personalizada
+        JLabel titleLabel = new JLabel("Bem-vindo, " + nomeUsuario + " - Embaixada");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setForeground(Color.WHITE);
+
+        // Primeiro JComboBox com opções específicas
+        String[] opcoes;
         if ("Brasileiro".equals(nacionalidade)) {
-            criarOpcoesBrasileiro(nomeUsuario);
+            opcoes = new String[]{
+                    "Solicitar Visto",
+                    "Solicitar Passaporte",
+                    "Exibir Documentos",
+                    "Exibir informações pessoais"
+            };
         } else {
-            criarOpcoesEstrangeiro(nomeUsuario);
+            opcoes = new String[]{
+                    "Solicitar Visto",
+                    "Solicitar Passaporte",
+                    "Exibir Documentos",
+                    "Exibir informações pessoais"
+            };
         }
 
+        JComboBox<String> comboBox = new JComboBox<>(opcoes);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        // Segundo JComboBox com opções adicionais
+        String[] menuOpcoes = {"Menu", "Logout", "Suporte"};
+        JComboBox<String> menuComboBox = new JComboBox<>(menuOpcoes);
+        menuComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        // Adiciona componentes ao painel superior
+        topPanel.add(comboBox);
+        topPanel.add(menuComboBox);
+        topPanel.add(Box.createHorizontalStrut(20)); // Espaçamento
+        topPanel.add(titleLabel);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        // Botão Confirmar
+        JButton confirmarButton = new JButton("Confirmar");
+        confirmarButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        confirmarButton.setBackground(new Color(50, 150, 50));
+        confirmarButton.setForeground(Color.WHITE);
+        confirmarButton.setFocusPainted(false);
+        confirmarButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel.add(Box.createVerticalStrut(100));
+        panel.add(confirmarButton);
+
+        // Ação para o botão "Confirmar"
+        confirmarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String opcaoSelecionada = (String) comboBox.getSelectedItem();
+
+                switch (opcaoSelecionada) {
+                    case "Solicitar Visto":
+                        new TelaSolicitarVisto().setVisible(true);
+                        dispose();
+                        break;
+                    case "Solicitar Passaporte":
+                        new TelaSolicitarPassaporte().setVisible(true);
+                        dispose();
+                        break;
+                    case "Exibir Documentos":
+                        new TelaExibirDocumentos().setVisible(true);
+                        dispose();
+                        break;
+                    case "Exibir informações pessoais":
+                        new TelaExibirDadosUsuario(SessaoUsuario.getIdUsuarioLogado()).setVisible(true);
+                        dispose();
+                        break;
+
+
+                    default:
+                        JOptionPane.showMessageDialog(null, "Opção inválida.");
+                        break;
+                }
+            }
+        });
+
+        // Ação para o segundo JComboBox (Logout e Suporte)
+        menuComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedOption = (String) menuComboBox.getSelectedItem();
+                if ("Logout".equals(selectedOption)) {
+                    JOptionPane.showMessageDialog(null, "Você foi desconectado.");
+                    dispose();
+                    new LoginTela().setVisible(true);
+
+
+                } else if ("Suporte".equals(selectedOption)) {
+                    JOptionPane.showMessageDialog(null, "Contate o suporte pelo email: suporte@embaixada.com");
+                }
+            }
+        });
+
         setVisible(true);
-    }
-
-    private void criarOpcoesBrasileiro(String nomeUsuario) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(240, 240, 240));
-        add(panel, BorderLayout.CENTER);
-
-        // Criando os botões estilizados
-        JButton vistoButton = criarBotao("Solicitar Visto");
-        JButton passaporteButton = criarBotao("Solicitar Passaporte");
-        JButton consultaButton = criarBotao("Consultas de Documentos");
-        JButton certificadoButton = criarBotao("Emitir Certificados");
-
-        // Adicionando botões ao painel
-        panel.add(passaporteButton);
-        panel.add(vistoButton);
-        panel.add(consultaButton);
-        panel.add(certificadoButton);
-
-        // Barra superior estilizada com saudação personalizada
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(new Color(0, 123, 255)); // Azul mais suave
-        JLabel titleLabel = new JLabel("Bem-vindo, " + nomeUsuario + " - Embaixada Brasileira", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        titleLabel.setForeground(Color.WHITE);
-        topPanel.add(titleLabel);
-        add(topPanel, BorderLayout.NORTH);
-
-        // Ação para o botão "Solicitar Visto"
-        vistoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Redireciona para a tela de solicitação de visto
-                new TelaSolicitarVisto().setVisible(true);
-                dispose();
-            }
-        });
-
-        // Ação para o botão "Solicitar Passaporte"
-        passaporteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Redireciona para a tela de solicitação de passaporte
-                new TelaSolicitarPassaporte().setVisible(true);
-                dispose();
-            }
-        });
-    }
-
-    private void criarOpcoesEstrangeiro(String nomeUsuario) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(240, 240, 240));
-        add(panel, BorderLayout.CENTER);
-
-        // Criando os botões estilizados
-        JButton vistoButton = criarBotao("Solicitar Visto");
-        JButton passaporteButton = criarBotao("Solicitar Passaporte");  // Adicionando Passaporte para estrangeiros
-        JButton consultaButton = criarBotao("Consulta de Documentos");
-        JButton infoConsularButton = criarBotao("Obter Informação Consular");
-
-        // Adicionando botões ao painel
-        panel.add(passaporteButton);
-        panel.add(vistoButton);
-        panel.add(consultaButton);
-        panel.add(infoConsularButton);
-
-        // Barra superior estilizada com saudação personalizada
-        JPanel topPanel = new JPanel();
-        topPanel.setBackground(new Color(220, 53, 69)); // Vermelho mais suave
-        JLabel titleLabel = new JLabel("Bem-vindo, " + nomeUsuario + " - Embaixada Estrangeira", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        titleLabel.setForeground(Color.WHITE);
-        topPanel.add(titleLabel);
-        add(topPanel, BorderLayout.NORTH);
-
-        // Ação para o botão "Solicitar Visto"
-        vistoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Redireciona para a tela de solicitação de visto
-                new TelaSolicitarVisto().setVisible(true);
-                dispose();
-            }
-        });
-
-        // Ação para o botão "Solicitar Passaporte" para estrangeiros
-        passaporteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Redireciona para a tela de solicitação de passaporte
-                new TelaSolicitarPassaporte().setVisible(true);
-                dispose();
-            }
-        });
-    }
-
-
-    private JButton criarBotao(String texto) {
-        JButton botao = new JButton(texto);
-        botao.setFont(new Font("Arial", Font.PLAIN, 16));
-        botao.setForeground(Color.WHITE);
-        botao.setBackground(new Color(50, 150, 50));  // Verde mais suave
-        botao.setFocusPainted(false);
-        botao.setPreferredSize(new Dimension(350, 60));  // Botões maiores e proporcionais
-
-        return botao;
     }
 
     public static void main(String[] args) {
